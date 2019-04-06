@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>//使用方法一
+</body>
+<script src="public/axios.js"></script>
+<script>
+    let path = "https://m.yaojunrong.com/book"
+    //引入路径          .then接受返回值
+    // axios.get(path).then(res=>{
+    //     console.log(res);
+    // })//拿到电子书的数据
+
+    // 自己封装的axios开始
+    //能用.get语法调用 就是一个新的对象
+    function myAjax(){
+        //eS6字面量方法
+        return{
+            get(url){
+                return new Promise((resolve,reject)=>{
+                    let xhr = null;
+                    if(window.XMLHttpRequest){
+                        xhr = new XMLHttpRequest();
+                    }else{
+                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                    }
+                    xhr.open("GET",url);
+                    xhr.onreadystatechange = function(){
+                        if(xhr.readyState ==4&&xhr.status == 200){
+                            let data = JSON.parse(xhr.response);
+                            resolve(data);
+                        }else if(xhr.readyState == 4&&xhr.status>400){
+                            resolve(xhr.status)
+                        }
+                    };
+                    xhr.send()
+                })
+                //因为有两个"."语法 .get .then 因此执行完get(url)需要return一个promise
+
+
+            }
+        }
+    }
+    myAjax().get(path).then(res=>{
+        console.log(res);
+    })
+</script>
+</html>

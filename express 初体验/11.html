@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <button id="btn">发送get请求</button>
+    <button id="btn1">发送post请求</button>
+</body>
+<script>
+    function myAjax(){
+        //function parseJson(str){//拼接字符串 错了❎
+        function parseJson(obj){
+            let arr = [];
+            // /*
+            // * obj = {
+            // * name:"yaoming",
+            // * sex:"nanren",
+            // * }
+            // * */
+            //name=yaoming&sex=nanren
+            for (let key in obj){
+                arr.push(`${key}=${obj[key]}`)
+            }
+            // ["name = yaoming","sex = nanren"];转字符串 用arr.join
+            return arr.join("&");
+        }
+
+        //eS6字面量方法
+        return{
+            get(url){
+                return new Promise((resolve,reject)=>{
+                    let xhr = null;
+                    if(window.XMLHttpRequest){
+                        xhr = new XMLHttpRequest();
+                    }else{
+                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                    }
+                    xhr.open("GET",url);
+                    xhr.onreadystatechange = function(){
+                        if(xhr.readyState ==4&&xhr.status == 200){
+                            let data = JSON.parse(xhr.response);
+                            resolve(data);
+                        }else if(xhr.readyState == 4&&xhr.status>400){
+                            resolve(xhr.status)
+                        }
+                    };
+                    xhr.send()
+                })
+            },
+            post(url,data={}){
+                // data = data || {};
+                return new Promise((resolve,reject) => {
+                    let xhr = null;
+                    if(window.XMLHttpRequest){
+                        xhr = new XMLHttpRequest();
+                    }else{
+                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                    }
+                    xhr.open("POST",url);
+                    xhr.setRequestHeader("Content-Type",
+                        "application/x-www-form-urlencoded");//post多一个请求头
+                    xhr.onreadystatechange = function(){
+                        if(xhr.readyState==4&&xhr.status == 200){
+                            let data = JSON.parse(xhr.response);
+                            resolve(data);
+                        }else if(xhr.readyState == 4&&xhr.status>400){
+                            resolve(xhr.status)
+                        }
+                    }
+                    //带信息必须是特殊的格式 既：查询字符串
+                    // name=yaoming&sex=nanren
+                    xhr.send(parseJson(data));
+                })
+            }
+
+        }
+    }
+</script>
+<script>
+    var btn = document.getElementById("btn");
+    var sendPost = document.getElementById("btn1");
+
+    btn.onclick = function () {
+        //myAjax().get("查询字符串")//路径
+        myAjax().get("/something?sex=nanren&name=yaoming&shengao=216").then(res=>{
+            console.log(res)
+        })
+    };
+
+    sendPost.onclick = function () {
+        myAjax().post("/getPost",{
+            name:"chenqiaoen",
+            sex:"girl",
+            age:18
+        }).then(res=>{
+            console.log(res);
+        })
+    }
+</script>
+
+</html>

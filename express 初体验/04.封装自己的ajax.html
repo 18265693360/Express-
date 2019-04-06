@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <button id = "btn">发送post请求</button>
+</body>
+<script>
+    var btn = document.getElementById("btn");
+
+    //封装开始
+    function ajax(opt){
+        opt.type = opt.type || "GET";
+        opt.async = opt.async || true;//默认异步
+        //传参
+        var xhr = null;
+
+
+        if(window.XMLHttpRequest){//判断IE6还是标准浏览器
+            xhr = new XMLHttpRequest();
+
+        }else{//IE6
+            xhr = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xhr.open(opt.type, opt.url, opt.async);
+       // if(hxhr.type == "POST"){//错了 是xhr
+        if(xhr.type == "POST"){//错了 是xhr
+            //xhr.setRequestHeader("Content-type", "x-www-from-urlencoded");// 是urlencoded 不是urlencode    //设置请求头
+            xhr.setRequestHeader("Content-Type", "x-www-from-urlencoded");// 是urlencoded 不是urlencode  是"Content-Type" 不是"type"  //设置请求头
+        }
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState == 4&&xhr.status == 200){
+                opt.success(JSON.parse(xhr.response));
+            }
+        };
+        xhr.send();
+    }
+
+    ajax({
+        url:"https://m.yaojunrong.com/book",//此处地址一点都不可以错 否则object无法取得
+        success(res){
+            console.log(res)
+        }
+    });
+
+    btn.onclick = function(){
+       ajax({
+           url:"/post",
+           type:"POST",
+           success(res) {
+               console.log(res)
+           }
+       })
+    }
+</script>
+</html>
